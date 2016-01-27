@@ -1,5 +1,6 @@
 (ns jdbc-wrapper.core
-  (:require [clojure.java.jdbc1 :as jdbc]))
+  (:require [clojure.java.jdbc1 :as jdbc]
+            [taoensso.timbre :as timbre]))
 
 (defn- query-type [query]
   (or (when (keyword? query)
@@ -72,8 +73,11 @@
   result)
 
 (defn query*
-  ([db query] (query* db :jdbc query))
+  ([db query]
+   (timbre/info query)
+   (query* db :jdbc query))
   ([db return-type query]
+   (timbre/info query)
    (let [qt (query-type query)]
      (->> (jdbc-query db qt query)
           (return-query qt return-type)))))
