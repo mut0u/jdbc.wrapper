@@ -1,5 +1,5 @@
 (ns jdbc-wrapper.core
-  (:require [clojure.java.jdbc1 :as jdbc]
+  (:require [clojure.java.jdbc :as jdbc]
             [taoensso.timbre :as timbre]))
 
 (defn- query-type [query]
@@ -82,25 +82,14 @@
      (->> (jdbc-query db qt query)
           (return-query qt return-type)))))
 
-(comment
-  (w/query* *db* return-type (if (ifn? query) (fn [db] (binding [*db* db] (query))) query))
-  (def sitedb (let []
-                (def ^:dynamic *db* ds)
-                (fn ths
-                  ([query] (ths :jdbc query))
-                  ([return-type query]
-                   (w/query* *db* return-type
-                             (if (fn? query)
-                               (fn [db] (binding [*db* db] (query)))
-                               query))))))
-  (sitedb ["select * from users where id=1"])
-  (sitedb (fn [] (sitedb ["select * from users where id=1"]) (sitedb :set-rollback-only!)))
-  )
-
 (defmacro defdb [name db]
   (let [dynamic-name (symbol (str \* (clojure.core/name name) \*))]
     `(let []
        (def ~(vary-meta dynamic-name assoc :dynamic true) ~db)
+       (defmacro ~(symbol (str name "-with-transaction")) [~'& body#]
+         `(let []
+            (jdbc/with-db-transaction [~'~dynamic-name ~'~dynamic-name]
+              ~@(identity body#))))
        (defn ~name
          ([~'query]
           (~name :jdbc ~'query))

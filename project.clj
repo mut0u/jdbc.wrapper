@@ -1,11 +1,11 @@
-(defproject jdbc-wrapper "0.1.0"
+(defproject jdbc-wrapper "0.0.1"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.7.0"]
-                 [com.taoensso/timbre "3.4.0"]
-                 [org.clojure/java.jdbc1 "0.4.2"]]
+  :dependencies [[org.clojure/clojure "1.8.0"]
+                 [com.taoensso/timbre "4.7.4"]
+                 [org.clojure/java.jdbc "0.6.2-alpha3"]]
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}
-             :dev {:dependencies [[com.mchange/c3p0 "0.9.2.1"]]}})
+             :dev {:dependencies [[mysql/mysql-connector-java "5.1.18"]]}})
